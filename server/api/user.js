@@ -22,6 +22,20 @@ router.param('user', function (req, res, next, id) {
         });
  });
 
+ //Return all users
+ router.get("/", (req, res) =>{
+    User.find().then((users) =>{
+        if(!users){return res.sendStatus(404)}
+
+        return res.json({
+            users: users.map((user)=>{
+                return user.profile();
+            })
+        }).statusCode(200);
+
+     })
+ })
+
  //create a new user
  router.post("/", (req, res) => {
     var data = req.body;
@@ -36,9 +50,23 @@ router.param('user', function (req, res, next, id) {
     user.save(function (err) {
         if(!err){
             res.json(user.profile()).statusCode(201)
+        }else{
+            req.sendStatus(422)
         }
        
     })
+ })
+
+ //Delete user 
+ router.delete("/:user", (req,res) =>{
+     req.user.remove().then(function(){
+         return res.sendStatus(200);
+     })
+ })
+
+ //Update user
+ router.put("/", (req, res) =>{
+
  })
 
  module.exports = router;
