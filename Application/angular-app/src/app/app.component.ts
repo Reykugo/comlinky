@@ -10,8 +10,9 @@ import { OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
 })
 export class AppComponent implements OnInit {
   title = 'app';
-  users: Array<any>;
-  requesting : boolean;
+  newUser = {}; //to store values of create form
+  users: Array<any>; //Store all users 
+  requesting : boolean; //Use to check if a request is actally in process
 
   constructor(private userService: UserService){}
 
@@ -20,12 +21,34 @@ export class AppComponent implements OnInit {
     this.getUsers();
   }
 
+  //et all users profile in database
   getUsers(){
     this.requesting = true;
     this.userService.getUsers().subscribe((res) =>{
       this.users = res.users;
       this.requesting = false
     }, (err) =>{
+      this.requesting = false;
+    })
+  }
+
+  createUser(){
+    this.requesting = true;
+    this.userService.createUser(this.newUser).subscribe((res) =>{
+      this.users.push(res);
+      this.newUser = {};
+      this.requesting = false;
+    })
+  }
+
+  deleteUser(user){
+    this.requesting = true;
+    this.userService.deleteUser(user).subscribe(() =>{
+      this.users.forEach((u, i) =>{
+        if(u.id == user.id){
+          this.users.splice(i, 1);
+        }
+      });
       this.requesting = false;
     })
   }

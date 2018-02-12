@@ -52,6 +52,7 @@ schema.methods.comparePasswords = function (candidatePassword, cb) {
 **/
 schema.methods.profile = function () {
     return {
+        id: this._id,
         username: this.username,
         email: this.email
     }

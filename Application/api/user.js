@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const User = mongoose.model("User");
 
 //Call when url look like :/api/user/124562433142
+// return complete user by id object if given id is correct
 router.param('user', function (req, res, next, id) {
  
     if (!id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -27,12 +28,11 @@ router.param('user', function (req, res, next, id) {
     User.find().then((users) =>{
         if(!users){return res.sendStatus(404)}
 
-        return res.json({
+        return res.status(200).json({
             users: users.map((user)=>{
                 return user.profile();
             })
-        }).statusCode(200);
-
+        })
      })
  })
 
@@ -42,18 +42,16 @@ router.param('user', function (req, res, next, id) {
     var user = new User({
         name : data.name,
         firstName: data.firstName,
+        username: data.username,
         email: data.email,
         password: data.password
     })
 
     //send json contains user profile after saved user
-    user.save(function (err) {
-        if(!err){
-            res.json(user.profile()).statusCode(201)
-        }else{
-            req.sendStatus(422)
-        }
-       
+    user.save().then(() =>{
+        res.status(201).json(user.profile()) 
+    }).catch((err) =>{
+        res.sendStatus(422)
     })
  })
 
