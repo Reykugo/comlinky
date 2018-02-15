@@ -2,8 +2,10 @@
 
 const router = require('express').Router();
 const mongoose = require('mongoose');
-
+const validator = require('validator'); //module to check params if param like email is valid
 const User = mongoose.model("User");
+const userUtils = require("../utils/user")
+const genericUtils = require("../utils/generic")
 
 //Call when url look like :/api/user/124562433142
 // return complete user by id object if given id is correct
@@ -23,7 +25,9 @@ router.param('user', function (req, res, next, id) {
         });
  });
 
- //Return all users
+ /**
+  Return all users profile
+  */
  router.get("/", (req, res) =>{
     User.find().then((users) =>{
         if(!users){return res.sendStatus(404)}
@@ -39,30 +43,47 @@ router.param('user', function (req, res, next, id) {
  //create a new user
  router.post("/", (req, res) => {
     var data = req.body;
-    var user = new User({
-        name : data.name,
-        firstName: data.firstName,
-        username: data.username,
-        email: data.email,
-        password: data.password
-    })
-
-    //send json contains user profile after saved user
-    user.save().then(() =>{
-        res.status(201).json(user.profile()) 
-    }).catch((err) =>{
-        res.sendStatus(422)
-    })
+    if (genericUtils.isParamsAreEmptyOrUndefined(data)){
+        res.sendStatus(422);
+    }
+    else if (!userUtils.isSamePasswords(data.password, data.confirmPassword)){
+        res.status(422).json({"error": "not same passwords"});
+    }
+    else if (! validator.isEmail(data.email)){
+        res.status(422).json({"error":"bad email"});
+    }
+    else if (userUtils.isUserExists(data.email)){
+        res.status(422).json({"error":"user already exists"});
+    }else{
+        var user = new User({
+            name : data.name,
+            firstName: data.firstName,
+            username: data.username,
+            email: data.email,
+            password: data.password
+        })
+    
+        //send json contains user profile after saved user
+        user.save().then(() =>{
+            res.status(201).json(user.profile()) 
+        }).catch((err) =>{
+            res.sendStatus(500);
+        })
+    }   
  })
 
- //Delete user 
+ /**
+  *Delete a user by id
+  */
  router.delete("/:user", (req,res) =>{
      req.user.remove().then(function(){
-         return res.sendStatus(200);
+        return res.sendStatus(200);
      })
  })
 
- //Update user
+ /**
+  Update user
+  */
  router.put("/", (req, res) =>{
 
  })

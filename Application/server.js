@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 
 var mongoose = require('mongoose')
 var session = require('express-session');
-var Store = require('connect-mongo')(session)
+//var Store = require('connect-mongo')(session)
 
 var app = express();
 
@@ -36,13 +36,13 @@ mongoose.connect('mongodb://localhost/comlinky', function(err){
 })
 
 //Create sessions for users
-app.use(session({
+/*app.use(session({
 	store: new Store({mongooseConnection:mongoose.connection}),
     secret: 'secret',
     resave: false,
     saveUninitialized: true
 
-}));
+}));*/
 
 //Enable CORS
 //Use for dev to communicate with angular when angular run to another port 
@@ -61,5 +61,8 @@ app.use(express.static(path.join(__dirname, 'angular-app/dist')));
 app.get('*', (req, res) =>{
    res.sendFile(path.join(__dirname, 'angular-app/dist/index.html'));
 })
+
+
+app.post("/authenticated")
 
 module.exports = app;
