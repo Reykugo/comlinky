@@ -4,8 +4,8 @@ const router = require('express').Router();
 const mongoose = require('mongoose');
 const validator = require('validator'); //module to check params if param like email is valid
 const User = mongoose.model("User");
-const userUtils = require("../utils/user")
-const genericUtils = require("../utils/generic")
+const userUtils = require("../utils/userUtils")
+const genericUtils = require("../utils/genericUtils")
 
 //Call when url look like :/api/user/124562433142
 // return complete user by id object if given id is correct
@@ -28,17 +28,31 @@ router.param('user', function (req, res, next, id) {
  /**
   Return all users profile
   */
- router.get("/", (req, res) =>{
-    User.find().then((users) =>{
-        if(!users){return res.sendStatus(404)}
-
-        return res.status(200).json({
-            users: users.map((user)=>{
-                return user.profile();
+ router.get("/", userUtils.isClient ,(req, res) =>{
+    if (req.session.access == "admin"){
+        User.find().then((users) =>{
+            if(!users){return res.sendStatus(404)}
+    
+            return res.status(200).json({
+                users: users.map((user)=>{
+                    return user.profile();
+                })
             })
-        })
-     })
+         })
+    }
+    else{
+        return res.status(403).send({access:false, message:"access not permitted"})
+    }
+   
  })
+
+ router.get("/info", userUtils.isClient, (req, res) =>{
+     User.findById(req.session.userId, function(err, user){
+         if(user){
+             return res.status(200).send({success:true, user: user});
+         }
+     })
+ });
 
  //create a new user
  router.post("/", (req, res) => {

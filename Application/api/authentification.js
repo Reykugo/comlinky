@@ -4,8 +4,10 @@ const router = require('express').Router();
 const mongoose = require('mongoose');
 const User = mongoose.model("User");
 const validator = require('validator'); //module to check params if param like email is valid
-const userUtils = require("../utils/user")
+const userUtils = require("../utils/userUtils")
 const jwt = require("jsonwebtoken");
+const config = require("../utils/config");
+
 
 router.post("/signIn", (req, res) =>{
     var data = req.body;
@@ -17,17 +19,21 @@ router.post("/signIn", (req, res) =>{
                     if(isMatch){
                         const payload = {
                             access: user.access,
-                            user: user.email 
+                            userId: user.id, 
                         };
-                        var token = jwt.sign(payload, "pwd", {
+                    
+                        var token = jwt.sign(payload, config.superSecret, {
                             expiresIn: 1440 // expires in 24 hours
                         });
+                        res.cookie("token", token, { maxAge: 900000, httpOnly: true })
                         // return the information including token as JSON
-                        res.status(201).json({token: token}); 
+                        res.status(200).json({token:token, sucess:true}); 
                     }else{
-                        res.sendStatus(402);
+                        res.sendStatus(400);
                     }
                 })
+            }else{
+                res.sendStatus(400);
             }
         })
     }
