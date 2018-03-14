@@ -89,8 +89,13 @@ router.param('user', function (req, res, next, id) {
  /**
   *Delete a user by id
   */
- router.delete("/:user", (req,res) =>{
+ router.delete("/:user", userUtils.isClient, (req,res) =>{
+     var deletedUserId = req.user.id; 
      req.user.remove().then(function(){
+         if (deletedUserId == req.session.userId){
+            res.clearCookie("token");
+            return res.status(200).send({success:true})
+         }
         return res.sendStatus(200);
      })
  })

@@ -41,6 +41,22 @@ export class AppComponent implements OnInit {
     })
   }
 
+  connectUser(){
+    this.requesting = true;
+    this.userService.connectUser(this.newUser).subscribe((res)=>{
+      this.newUser = {};
+      this.requesting = false;
+      this.getUsers();
+    })
+  }
+
+  disconnectUser(){
+    this.requesting = true;
+    this.userService.disconnectUser().subscribe((res)=>{
+      this.requesting = false;
+    })
+  }
+
   deleteUser(user){
     this.requesting = true;
     this.userService.deleteUser(user).subscribe(() =>{

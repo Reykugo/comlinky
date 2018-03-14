@@ -42,7 +42,8 @@ const user = {
         if(token){
             jwt.verify(token, config.superSecret, function(err, decoded){
                 if(err){
-                    return res.json({success:false, message:"Failed to authenticate token"});
+                    console.log(err)
+                    return res.status(403).send({success:false, message:"Failed to authenticate token"});
                 }else{
                     req.session = decoded;
                     next();

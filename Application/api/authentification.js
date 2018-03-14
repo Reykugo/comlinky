@@ -23,9 +23,9 @@ router.post("/signIn", (req, res) =>{
                         };
                     
                         var token = jwt.sign(payload, config.superSecret, {
-                            expiresIn: 1440 // expires in 24 hours
+                            expiresIn: 86400 // expires in 24 hours
                         });
-                        res.cookie("token", token, { maxAge: 900000, httpOnly: true })
+                        res.cookie("token", token, { maxAge: 24*3600*1000, httpOnly: true })
                         // return the information including token as JSON
                         res.status(200).json({token:token, sucess:true}); 
                     }else{
@@ -38,7 +38,11 @@ router.post("/signIn", (req, res) =>{
         })
     }
    
-    
+})
+
+router.get("/logOut",userUtils.isClient, (req, res) =>{
+    res.clearCookie("token");
+    res.status(200).send({success:true})
 })
 
 

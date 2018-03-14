@@ -29,5 +29,13 @@ export class UserService {
    updateUser(user){
        return this.http.put(environment.api + "/user/user", user).map(res => res.json());
    }
+
+   connectUser(user){
+       return this.http.post(environment.api + "/authentification/signIn", user).map(res => res.json());
+   }
+
+   disconnectUser(){
+       return this.http.get(environment.api +"/authentification/logOut");
+   }
  
 }
