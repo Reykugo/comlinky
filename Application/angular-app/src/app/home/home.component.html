@@ -1,0 +1,5 @@
+<div *ngFor="let user of users; let i = index" class="user" style="border:1px solid black; margin:10px">
+  <button class="btn btn-danger btn-sm" style="margin:7px;float:right;" (click)="deleteUser(user)" [disabled]="requesting"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
+  <p class="todo-username">username: {{user.username}}</p>
+  <p class="todo-email">email : {{user.email}}</p>  
+</div>
