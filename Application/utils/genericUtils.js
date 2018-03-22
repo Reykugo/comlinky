@@ -16,6 +16,15 @@ const generic = {
         return false;
     },
 
+    /**
+     * check if param is empty or undefined
+     * @param {var} param 
+     * @return {boolean} 
+     */
+    isEmpty: function(value){
+		return value == undefined || value == "" || value == [];
+	},
+
 }
 
 module.exports = generic;

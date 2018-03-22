@@ -11,6 +11,12 @@ var session = require('express-session');
 
 var app = express();
 
+var cors = require('cors');
+var functions = require('./twitter/functions');
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(cors());
+app.post('/authorize', functions.authorize);
+app.post('/search', functions.search);
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -58,7 +64,7 @@ app.use(function(req, res, next) {
 app.use(express.static(path.join(__dirname, 'angular-app/dist')));
  
 //Catch all other routes and return to the index file
-app.get('*', (req, res) =>{
+app.get('/', (req, res) =>{
    res.sendFile(path.join(__dirname, 'angular-app/dist/index.html'));
 })
 

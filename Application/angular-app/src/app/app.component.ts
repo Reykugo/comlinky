@@ -3,6 +3,8 @@ import { Component } from '@angular/core';
 import {UserService} from './services/user.service';
 import { OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
 
+import { Http, Headers} from '@angular/http';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -14,40 +16,13 @@ export class AppComponent implements OnInit {
   users: Array<any>; //Store all users 
   requesting : boolean; //Use to check if a request is actally in process
 
-  constructor(private userService: UserService){}
+  searchquery = '';
+  tweetsdata;
+
+  constructor(private userService: UserService, private http: Http){}
 
   ngOnInit(){
     this.requesting = false;
-    this.getUsers();
-  }
-
-  //et all users profile in database
-  getUsers(){
-    this.requesting = true;
-    this.userService.getUsers().subscribe((res) =>{
-      this.users = res.users;
-      this.requesting = false
-    }, (err) =>{
-      this.requesting = false;
-    })
-  }
-
-  createUser(){
-    this.requesting = true;
-    this.userService.createUser(this.newUser).subscribe((res) =>{
-      this.users.push(res);
-      this.newUser = {};
-      this.requesting = false;
-    })
-  }
-
-  connectUser(){
-    this.requesting = true;
-    this.userService.connectUser(this.newUser).subscribe((res)=>{
-      this.newUser = {};
-      this.requesting = false;
-      this.getUsers();
-    })
   }
 
   disconnectUser(){
@@ -57,15 +32,24 @@ export class AppComponent implements OnInit {
     })
   }
 
-  deleteUser(user){
-    this.requesting = true;
-    this.userService.deleteUser(user).subscribe(() =>{
-      this.users.forEach((u, i) =>{
-        if(u.id == user.id){
-          this.users.splice(i, 1);
-        }
-      });
-      this.requesting = false;
+  makecall() {
+    var headers = new Headers();
+    
+    headers.append('Content-Type', 'application/X-www-form-urlencoded');
+    
+    this.http.post('http://localhost:3000/authorize', {headers: headers}).subscribe((res) => {
+      console.log(res);
     })
+  }
+
+  searchcall(){
+    var headers = new Headers();
+    var searchterm = 'query=' + this.searchquery;
+    
+    headers.append('Content-Type', 'application/X-www-form-urlencoded');
+    
+    this.http.post('http://localhost:3000/search', searchterm, {headers: headers}).subscribe((res) => {
+      this.tweetsdata = res.json().data.statuses;
+    });
   }
 }

@@ -14,7 +14,10 @@ var schema = new Schema({
     email: {type:String, required: true},
     password: {type:String, required:true},
     access: {type:String, default: "user"},
-    createdOn: {type:Date, default: Date.now}
+    createdOn: {type:Date, default: Date.now},
+    twitterToken: {type:String},
+    youtubeToken: {type:String},
+    instagramToken: {type:String}
 })
 
 /**

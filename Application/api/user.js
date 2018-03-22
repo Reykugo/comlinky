@@ -46,28 +46,34 @@ router.param('user', function (req, res, next, id) {
    
  })
 
+ //get info of connected user
  router.get("/info", userUtils.isClient, (req, res) =>{
      User.findById(req.session.userId, function(err, user){
          if(user){
              return res.status(200).send({success:true, user: user});
+         }else{
+             return res.status(400).send({success:false})
          }
      })
  });
 
- //create a new user
+ /**
+  Create a new user
+  * Requested parameter: email, password, confirmPassword, firstname, username, lastname
+ */
  router.post("/", (req, res) => {
     var data = req.body;
     if (genericUtils.isParamsAreEmptyOrUndefined(data)){
         res.sendStatus(422);
     }
     else if (!userUtils.isSamePasswords(data.password, data.confirmPassword)){
-        res.status(422).json({"error": "not same passwords"});
+        res.status(422).json({error: "not same passwords"});
     }
     else if (! validator.isEmail(data.email)){
-        res.status(422).json({"error":"bad email"});
+        res.status(422).json({error:"bad email"});
     }
     else if (userUtils.isUserExists(data.email)){
-        res.status(422).json({"error":"user already exists"});
+        res.status(422).json({error:"user already exists"});
     }else{
         var user = new User({
             name : data.name,
@@ -87,12 +93,14 @@ router.param('user', function (req, res, next, id) {
  })
 
  /**
-  *Delete a user by id
+  Delete a user by id
+  * Requested query parameter: id
   */
  router.delete("/:user", userUtils.isClient, (req,res) =>{
      var deletedUserId = req.user.id; 
      req.user.remove().then(function(){
          if (deletedUserId == req.session.userId){
+             console.log("hey je suis passé batard")
             res.clearCookie("token");
             return res.status(200).send({success:true})
          }
@@ -103,8 +111,43 @@ router.param('user', function (req, res, next, id) {
  /**
   Update user
   */
- router.put("/", (req, res) =>{
+ router.put("/", userUtils.isClient, (req, res) =>{
+    var data = req.body;
+    User.findById(req.session.userId, function(err,user){
+        if(user){
+            var error = "";
+            var username_exists = User.findOne({username: data.username}, function (err, userInBase) {
+                if (userInBase && data.username != user.username) {
+                    error = "username already exists";
+                }
+            });
 
+            var email_exists =  User.findOne({email: data.email}, function (err, userInBase) {
+                if (userInBase && data.email != user.email) {
+                    error = "email already exists";
+                }
+            });
+            Promise.all([username_exists, email_exists]).then(function(){
+                if(error != ""){
+                    return res.status(400).send({success:false, error: error})
+                }
+                if (genericUtils.isParamsAreEmptyOrUndefined(data)){
+                    return res.status(400).send({success:false, error: "a field is empty or undefined"});
+                }
+                if (!validator.isEmail(data.email)){
+                    return res.status(400).send({success:false, error: "is bad email"});
+                }
+                Object.assign(user, data)
+                user.save().then(updated_user =>{
+                    return res.status(200).send({success:true});
+                }).catch(e=>{
+                    console.log(e)
+                    return res.sendStatus(500);
+                })
+            })
+           
+        }
+    })
  })
 
  module.exports = router;

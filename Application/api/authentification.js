@@ -8,7 +8,10 @@ const userUtils = require("../utils/userUtils")
 const jwt = require("jsonwebtoken");
 const config = require("../utils/config");
 
-
+/**
+  Connect user and send token
+ * Requested parameters: email , password
+ */
 router.post("/signIn", (req, res) =>{
     var data = req.body;
     console.log(data);
@@ -40,6 +43,7 @@ router.post("/signIn", (req, res) =>{
    
 })
 
+//Disconnect user
 router.get("/logOut",userUtils.isClient, (req, res) =>{
     res.clearCookie("token");
     res.status(200).send({success:true})
