@@ -15,7 +15,6 @@ var cors = require('cors');
 var functions = require('./twitter/functions');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors());
-app.post('/authorize', functions.authorize);
 app.post('/search', functions.search);
 
 // uncomment after placing your favicon in /public

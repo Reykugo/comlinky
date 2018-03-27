@@ -15,9 +15,8 @@ export class AppComponent implements OnInit {
   newUser = {}; //to store values of create form
   users: Array<any>; //Store all users 
   requesting : boolean; //Use to check if a request is actally in process
-
   searchquery = '';
-  tweetsdata;
+  tweetsdata; // Liste contenant les tweets
 
   constructor(private userService: UserService, private http: Http){}
 
@@ -32,16 +31,6 @@ export class AppComponent implements OnInit {
     })
   }
 
-  makecall() {
-    var headers = new Headers();
-    
-    headers.append('Content-Type', 'application/X-www-form-urlencoded');
-    
-    this.http.post('http://localhost:3000/authorize', {headers: headers}).subscribe((res) => {
-      console.log(res);
-    })
-  }
-
   searchcall(){
     var headers = new Headers();
     var searchterm = 'query=' + this.searchquery;
@@ -49,7 +38,7 @@ export class AppComponent implements OnInit {
     headers.append('Content-Type', 'application/X-www-form-urlencoded');
     
     this.http.post('http://localhost:3000/search', searchterm, {headers: headers}).subscribe((res) => {
-      this.tweetsdata = res.json().data.statuses;
+      this.tweetsdata = res.json().data;
     });
   }
 }
