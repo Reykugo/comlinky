@@ -19,6 +19,10 @@ export class HomeComponent implements OnInit {
   	this.getUsers();
   }
 
+  ngOnChange(){
+    this.getUsers();
+  }
+
   //et all users profile in database
   getUsers(){
     this.requesting = true;

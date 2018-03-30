@@ -37,8 +37,8 @@ const user = {
     },
 
     isClient: function(req, res, next){
-        //var token = req.body.token || req.query.token || req.headers["x-access-token"];
-        var token = req.cookies.token
+        var token = req.body.token || req.query.token || req.headers["x-access-token"];
+        //var token = req.cookies.token
         if(token){
             jwt.verify(token, config.superSecret, function(err, decoded){
                 if(err){
@@ -58,8 +58,8 @@ const user = {
     },
 
     isNotClient: function(req, res, next){
-        //var token = req.body.token || req.query.token || req.headers["x-access-token"];
-        var token = req.cookies.token
+        var token = req.body.token || req.query.token || req.headers["x-access-token"];
+        //var token = req.cookies.token
         if(token){
             return res.status(403).json({success: false, message:"Already have token"});
         }else{

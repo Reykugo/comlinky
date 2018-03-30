@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import {Router} from '@angular/router';
 
 import {UserService} from './services/user.service';
 import { OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
@@ -18,17 +19,15 @@ export class AppComponent implements OnInit {
   searchquery = '';
   tweetsdata; // Liste contenant les tweets
 
-  constructor(private userService: UserService, private http: Http){}
+  constructor(private userService: UserService, private http: Http, private router:Router){}
 
   ngOnInit(){
     this.requesting = false;
   }
 
   disconnectUser(){
-    this.requesting = true;
-    this.userService.disconnectUser().subscribe((res)=>{
-      this.requesting = false;
-    })
+    localStorage.removeItem("jwtToken");
+    this.router.navigate(['']);
   }
 
   searchcall(){
